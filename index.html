@@ -386,6 +386,7 @@
             'A29': 'ŞERİFE GÜL AKŞİT',
             'A9': 'EMİNE GÜL TÜRKOĞLU'
         };
+        
         // Global değişkenler
         let map, marker, userLocationMarker;
         let currentData = {
@@ -481,6 +482,22 @@
 
         // Kullanıcı girişi
 function startDataCollection() {
+        console.log('Fonksiyon çalıştı!'); // TEST
+    const nameInput = document.getElementById('userNameInput');
+    const bolgeKodu = nameInput.value.trim().toUpperCase();
+    console.log('Girilen kod:', bolgeKodu); // TEST
+    
+    if (bolgeKodu === '') {
+        alert('Lütfen bölge kodunuzu giriniz');
+        return;
+    }
+    
+    console.log('Öğrenci listesi:', ogrenciListesi); // TEST
+    const ogrenciAdi = ogrenciListesi[bolgeKodu];
+    console.log('Bulunan öğrenci:', ogrenciAdi); // TEST
+    
+    // ... devamı
+}
     const nameInput = document.getElementById('userNameInput');
     const bolgeKodu = nameInput.value.trim().toUpperCase();
     
