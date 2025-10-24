@@ -277,16 +277,17 @@
         
         <div class="content">
             <!-- Giriş Ekranı -->
-            <div class="step active" id="loginScreen">
-                <div class="login-screen">
-                    <h2>📋 Veri Toplama Başlangıç</h2>
-                    <p>Lütfen bölge bilgilerinizi girin</p>
-                    <div class="input-group">
-                        <input type="text" id="userNameInput" placeholder="Bölge kodu" />
-                    </div>
-                    <button class="btn btn-primary" onclick="startDataCollection()">Başla</button>
-                </div>
-            </div>
+<div class="step active" id="loginScreen">
+    <div class="login-screen">
+        <h2>📋 Veri Toplama Başlangıç</h2>
+        <p>Lütfen bölge kodunuzu girin</p>
+        <div class="input-group">
+            <input type="text" id="userNameInput" placeholder="Bölge kodu (örn: A24, K22)" style="text-transform: uppercase;" />
+        </div>
+        <button class="btn btn-primary" onclick="startDataCollection()">Başla</button>
+        <div id="welcomeMessage" style="margin-top: 20px; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 10px; color: #155724; display: none;"></div>
+    </div>
+</div>
 
             <!-- Adım 1: Konum Seçimi -->
             <div class="step" id="step1">
@@ -350,6 +351,40 @@
     </div>
 
     <script>
+        // Öğrenci listesi - Bölge kodu ile eşleşme
+        const ogrenciListesi = {
+            'A24': 'MERYEM GÖKLER',
+            'A3': 'BEFRİN BAYHAN',
+            'K22': 'AZAT GÖNÜLTAŞ',
+            'A21': 'GAMZE TUĞLU',
+            'A7': 'EMİNE EYLÜL AKYOL',
+            'A26': 'KAJİN İHTİYATOĞLU',
+            'A11': 'REZANUR UZUNER',
+            'A4': 'DERYA YILDIRIM',
+            'A8': 'AYŞE SUDE EVRAN',
+            'A37': 'MUHAMMET ARDA ÜLKER',
+            'A2': 'FATİME TOPCU',
+            'A6': 'ZEHRA AVLUKLU',
+            'A14': 'FERİDE NUR KİLCİ',
+            'K35': 'ALİ OSMAN YENİLMEZ',
+            'A32': 'SEVİM DEMİRTAŞ',
+            'A25': 'GİZEM OKUDUCU',
+            'A16': 'RABİA SELEK',
+            'A23': 'HANİFE NUR ÖZDEMİR',
+            'A34': 'ZEYNEP SUDE DOĞANLAR',
+            'K28': 'EREN ERMAN',
+            'K12': 'SÜLEYMAN AKAN',
+            'K17': 'YUSUF TOZLU',
+            'A33': 'NİDANUR KARAOĞLAN',
+            'A5': 'MELİKE ELİBOL',
+            'A13': 'MEDYA DAĞCI',
+            'A10': 'RUMEYSA ÖZDEMİR',
+            'A30': 'SAFİLE BUKET DEMİREL',
+            'K15': 'EMİRHAN AKDAĞ',
+            'A1': 'NAZİYE CEYLİN SARI',
+            'A29': 'ŞERİFE GÜL AKŞİT',
+            'A9': 'EMİNE GÜL TÜRKOĞLU'
+        };
         // Global değişkenler
         let map, marker, userLocationMarker;
         let currentData = {
@@ -445,33 +480,83 @@
 
         // Kullanıcı girişi
         function startDataCollection() {
-            const nameInput = document.getElementById('userNameInput');
-            const name = nameInput.value.trim();
-            
-            if (name === '') {
-                alert('Lütfen bölge bilgilerinizi giriniz');
-                nameInput.focus();
-                return;
-            }
-            
-            userName = name;
-            currentData.userName = userName;
-            
-            document.getElementById('loginScreen').classList.remove('active');
-            currentStep = 1;
-            document.getElementById('step1').classList.add('active');
-            
-setTimeout(() => {
-    if (map) {
-        map.invalidateSize();
-        // Kaydedilmiş tüm binaları göster
-        showAllSavedBuildings();
-        if (myLocation) {
-            map.setView([myLocation.lat, myLocation.lng], 18);
-        }
+    const nameInput = document.getElementById('userNameInput');
+    const bolgeKodu = nameInput.value.trim().toUpperCase(); // Büyük harfe çevir
+    
+    if (bolgeKodu === '') {
+        alert('Lütfen bölge kodunuzu giriniz (örn: A24, K22)');
+        nameInput.focus();
+        return;
     }
-}, 100);
-        }
+    
+    // Öğrenci listesinde kontrol et
+    const ogrenciAdi = ogrenciListesi[bolgeKodu];
+    
+    if (!ogrenciAdi) {
+        alert('⚠️ Bölge kodu bulunamadı!\n\nLütfen size verilen bölge kodunu kontrol edin.\nÖrnek: A24, K22, A3');
+        nameInput.focus();
+        return;
+    }
+    
+    // Karşılama mesajını göster
+    const welcomeMsg = document.getElementById('welcomeMessage');
+    welcomeMsg.innerHTML = `
+        <strong>👋 Merhaba ${ogrenciAdi}!</strong><br><br>
+        Yaptığın çalışma, depremlere karşı daha güvenli bir Altınyayla için çok önemli.<br><br>
+        Her bir gözlemin, gelecekte hayat kurtaracak bilgilerin parçası olacak.<br><br>
+        Dikkatli ve özenli çalışman için teşekkür ederiz. 💪
+    `;
+    welcomeMsg.style.display = 'block';
+    
+    // Kullanıcı bilgilerini kaydet
+    userName = `${bolgeKodu} - ${ogrenciAdi}`;
+    currentData.userName = userName;
+    
+    // 3 saniye sonra haritaya geç
+    setTimeout(() => {
+        document.getElementById('loginScreen').classList.remove('active');
+        currentStep = 1;
+        document.getElementById('step1').classList.add('active');
+        
+        setTimeout(() => {
+            if (map) {
+                map.invalidateSize();
+            }
+        }, 100);
+    }, 3000); // 3 saniye bekle
+}
+```
+
+---
+
+## ✅ Ne Değişti?
+
+1. **Bölge kodu girişi:** Otomatik büyük harfe çevrilir (a24 → A24)
+2. **Kontrol:** Bölge kodu listede yoksa hata verir
+3. **Karşılama mesajı:** Yeşil kutuda öğrencinin adıyla özel mesaj gösterilir
+4. **3 saniye bekleme:** Mesajı okusunlar diye, sonra otomatik haritaya geçer
+5. **Excel'de görünüm:** `A24 - MERYEM GÖKLER` şeklinde kaydedilir
+
+---
+
+## 🎨 Görünüm:
+
+Öğrenci **A24** girdiğinde:
+```
+┌────────────────────────────────────┐
+│  👋 Merhaba MERYEM GÖKLER!        │
+│                                    │
+│  Yaptığın çalışma, depremlere     │
+│  karşı daha güvenli bir           │
+│  Altınyayla için çok önemli.      │
+│                                    │
+│  Her bir gözlemin, gelecekte      │
+│  hayat kurtaracak bilgilerin      │
+│  parçası olacak.                  │
+│                                    │
+│  Dikkatli ve özenli çalışman      │
+│  için teşekkür ederiz. 💪         │
+└────────────────────────────────────┘
 
         // Harita başlatma
         function initMap() {
