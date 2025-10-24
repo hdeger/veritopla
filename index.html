@@ -482,50 +482,42 @@
 
         // Kullanıcı girişi
 function startDataCollection() {
-    alert('Test 1: Fonksiyon çalıştı!');
-    
     const nameInput = document.getElementById('userNameInput');
-    alert('Test 2: Input bulundu');
-    
     const bolgeKodu = nameInput.value.trim().toUpperCase();
-    alert('Test 3: Girilen kod = ' + bolgeKodu);
     
     if (bolgeKodu === '') {
-        alert('Kod boş!');
+        alert('Lütfen bölge kodunuzu giriniz (örn: A24, K22)');
+        nameInput.focus();
         return;
     }
     
-    alert('Test 4: Kod boş değil, kontrol ediliyor...');
-    
-    if (typeof ogrenciListesi === 'undefined') {
-        alert('HATA: ogrenciListesi tanımlı değil!');
-        return;
-    }
-    
-    alert('Test 5: Liste var, aranıyor...');
-    
+    // Öğrenci listesinde kontrol et
     const ogrenciAdi = ogrenciListesi[bolgeKodu];
-    alert('Test 6: Bulunan = ' + ogrenciAdi);
     
     if (!ogrenciAdi) {
-        alert('Bölge kodu bulunamadı!');
+        alert('⚠️ Bölge kodu bulunamadı!\n\nLütfen size verilen bölge kodunu kontrol edin.\nÖrnek: A24, K22, A3');
+        nameInput.focus();
         return;
     }
     
-    alert('Test 7: Öğrenci bulundu, mesaj gösteriliyor...');
-    
+    // Sadece bölge kodunu kaydet
     userName = bolgeKodu;
     currentData.userName = bolgeKodu;
     
+    // Karşılama mesajını göster
     const welcomeMsg = document.getElementById('welcomeMessage');
-    welcomeMsg.innerHTML = `<strong>👋 Merhaba ${ogrenciAdi}!</strong>`;
+    welcomeMsg.innerHTML = `
+        <strong>👋 Merhaba ${ogrenciAdi}!</strong><br><br>
+        Yaptığın çalışma, depremlere karşı daha güvenli bir Altınyayla için çok önemli.<br><br>
+        Her bir gözlemin, gelecekte hayat kurtaracak bilgilerin parçası olacak.<br><br>
+        Dikkatli ve özenli çalışman için teşekkür ederiz. 💪
+    `;
     welcomeMsg.style.display = 'block';
     
+    // Başla butonunu gizle, Devam Et butonunu göster
     document.getElementById('startBtn').style.display = 'none';
     document.getElementById('continueBtn').style.display = 'block';
     nameInput.disabled = true;
-    
-    alert('Test 8: Tamamlandı!');
 }
 
 
