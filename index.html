@@ -527,18 +527,7 @@ function startDataCollection() {
     
     alert('Test 8: Tamamlandı!');
 }
-// Haritaya geçiş fonksiyonu
-function continueToMap() {
-    document.getElementById('loginScreen').classList.remove('active');
-    currentStep = 1;
-    document.getElementById('step1').classList.add('active');
-    
-    setTimeout(() => {
-        if (map) {
-            map.invalidateSize();
-        }
-    }, 100);
-}
+
 
         // Harita başlatma
         function initMap() {
