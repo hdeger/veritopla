@@ -520,7 +520,19 @@ function startDataCollection() {
     nameInput.disabled = true;
 }
 
-
+// Haritaya geçiş fonksiyonu - BU ÇOK ÖNEMLİ!
+function continueToMap() {
+    document.getElementById('loginScreen').classList.remove('active');
+    currentStep = 1;
+    document.getElementById('step1').classList.add('active');
+    
+    setTimeout(() => {
+        if (map) {
+            map.invalidateSize();
+        }
+    }, 100);
+}
+        
         // Harita başlatma
         function initMap() {
             map = L.map('map').setView([37.1494, 30.5433], 15);
