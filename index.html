@@ -482,60 +482,51 @@
 
         // Kullanıcı girişi
 function startDataCollection() {
-        console.log('Fonksiyon çalıştı!'); // TEST
+    alert('Test 1: Fonksiyon çalıştı!');
+    
     const nameInput = document.getElementById('userNameInput');
+    alert('Test 2: Input bulundu');
+    
     const bolgeKodu = nameInput.value.trim().toUpperCase();
-    console.log('Girilen kod:', bolgeKodu); // TEST
+    alert('Test 3: Girilen kod = ' + bolgeKodu);
     
     if (bolgeKodu === '') {
-        alert('Lütfen bölge kodunuzu giriniz');
+        alert('Kod boş!');
         return;
     }
     
-    console.log('Öğrenci listesi:', ogrenciListesi); // TEST
-    const ogrenciAdi = ogrenciListesi[bolgeKodu];
-    console.log('Bulunan öğrenci:', ogrenciAdi); // TEST
+    alert('Test 4: Kod boş değil, kontrol ediliyor...');
     
-    // ... devamı
-}
-    const nameInput = document.getElementById('userNameInput');
-    const bolgeKodu = nameInput.value.trim().toUpperCase();
-    
-    if (bolgeKodu === '') {
-        alert('Lütfen bölge kodunuzu giriniz (örn: A24, K22)');
-        nameInput.focus();
+    if (typeof ogrenciListesi === 'undefined') {
+        alert('HATA: ogrenciListesi tanımlı değil!');
         return;
     }
     
-    // Öğrenci listesinde kontrol et
+    alert('Test 5: Liste var, aranıyor...');
+    
     const ogrenciAdi = ogrenciListesi[bolgeKodu];
+    alert('Test 6: Bulunan = ' + ogrenciAdi);
     
     if (!ogrenciAdi) {
-        alert('⚠️ Bölge kodu bulunamadı!\n\nLütfen size verilen bölge kodunu kontrol edin.\nÖrnek: A24, K22, A3');
-        nameInput.focus();
+        alert('Bölge kodu bulunamadı!');
         return;
     }
     
-    // Sadece bölge kodunu kaydet (isim yok)
+    alert('Test 7: Öğrenci bulundu, mesaj gösteriliyor...');
+    
     userName = bolgeKodu;
     currentData.userName = bolgeKodu;
     
-    // Karşılama mesajını göster
     const welcomeMsg = document.getElementById('welcomeMessage');
-    welcomeMsg.innerHTML = `
-        <strong>👋 Merhaba ${ogrenciAdi}!</strong><br><br>
-        Yaptığın çalışma, depremlere karşı daha güvenli bir Altınyayla için çok önemli.<br><br>
-        Her bir gözlemin, gelecekte hayat kurtaracak bilgilerin parçası olacak.<br><br>
-        Dikkatli ve özenli çalışman için teşekkür ederiz. 💪
-    `;
+    welcomeMsg.innerHTML = `<strong>👋 Merhaba ${ogrenciAdi}!</strong>`;
     welcomeMsg.style.display = 'block';
     
-    // Başla butonunu gizle, Devam Et butonunu göster
     document.getElementById('startBtn').style.display = 'none';
     document.getElementById('continueBtn').style.display = 'block';
-    nameInput.disabled = true; // Input'u kilitle
+    nameInput.disabled = true;
+    
+    alert('Test 8: Tamamlandı!');
 }
-
 // Haritaya geçiş fonksiyonu
 function continueToMap() {
     document.getElementById('loginScreen').classList.remove('active');
@@ -548,32 +539,6 @@ function continueToMap() {
         }
     }, 100);
 }
-```
-
----
-
-## ✅ Ne Değişti?
-
-1. **Excel'de sadece bölge kodu:** `A24` (isim yok) ✅
-2. **Dosya ismi:** `A24_beton_2024...` (Türkçe karakter yok) ✅
-3. **Mesaj gösterilir** ama beklemez ✅
-4. **"Devam Et" butonu** ile öğrenci hazır olunca ilerler ✅
-5. **Bölge kodu kilitleniyor** (yanlışlıkla değişmesin) ✅
-
----
-
-## 🎨 Akış:
-```
-1. Öğrenci A24 yazar
-   ↓
-2. "Başla" butonuna basar
-   ↓
-3. Yeşil kutuda mesaj görünür:
-   "👋 Merhaba MERYEM GÖKLER! ..."
-   ↓
-4. "Devam Et 🚀" butonu belirir
-   ↓
-5. Öğrenci butona basınca → Haritaya geçer
 
         // Harita başlatma
         function initMap() {
