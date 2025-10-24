@@ -284,8 +284,9 @@
         <div class="input-group">
             <input type="text" id="userNameInput" placeholder="Bölge kodu (örn: A24, K22)" style="text-transform: uppercase;" />
         </div>
-        <button class="btn btn-primary" onclick="startDataCollection()">Başla</button>
-        <div id="welcomeMessage" style="margin-top: 20px; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 10px; color: #155724; display: none;"></div>
+        <div id="welcomeMessage" style="margin-top: 20px; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 10px; color: #155724; display: none; text-align: left;"></div>
+        <button class="btn btn-primary" onclick="startDataCollection()" id="startBtn">Başla</button>
+        <button class="btn btn-primary" onclick="continueToMap()" id="continueBtn" style="display: none;">Devam Et 🚀</button>
     </div>
 </div>
 
@@ -479,9 +480,9 @@
         ];
 
         // Kullanıcı girişi
-        function startDataCollection() {
+function startDataCollection() {
     const nameInput = document.getElementById('userNameInput');
-    const bolgeKodu = nameInput.value.trim().toUpperCase(); // Büyük harfe çevir
+    const bolgeKodu = nameInput.value.trim().toUpperCase();
     
     if (bolgeKodu === '') {
         alert('Lütfen bölge kodunuzu giriniz (örn: A24, K22)');
@@ -498,6 +499,10 @@
         return;
     }
     
+    // Sadece bölge kodunu kaydet (isim yok)
+    userName = bolgeKodu;
+    currentData.userName = bolgeKodu;
+    
     // Karşılama mesajını göster
     const welcomeMsg = document.getElementById('welcomeMessage');
     welcomeMsg.innerHTML = `
@@ -508,22 +513,23 @@
     `;
     welcomeMsg.style.display = 'block';
     
-    // Kullanıcı bilgilerini kaydet
-    userName = `${bolgeKodu} - ${ogrenciAdi}`;
-    currentData.userName = userName;
+    // Başla butonunu gizle, Devam Et butonunu göster
+    document.getElementById('startBtn').style.display = 'none';
+    document.getElementById('continueBtn').style.display = 'block';
+    nameInput.disabled = true; // Input'u kilitle
+}
+
+// Haritaya geçiş fonksiyonu
+function continueToMap() {
+    document.getElementById('loginScreen').classList.remove('active');
+    currentStep = 1;
+    document.getElementById('step1').classList.add('active');
     
-    // 3 saniye sonra haritaya geç
     setTimeout(() => {
-        document.getElementById('loginScreen').classList.remove('active');
-        currentStep = 1;
-        document.getElementById('step1').classList.add('active');
-        
-        setTimeout(() => {
-            if (map) {
-                map.invalidateSize();
-            }
-        }, 100);
-    }, 3000); // 3 saniye bekle
+        if (map) {
+            map.invalidateSize();
+        }
+    }, 100);
 }
 ```
 
@@ -531,32 +537,26 @@
 
 ## ✅ Ne Değişti?
 
-1. **Bölge kodu girişi:** Otomatik büyük harfe çevrilir (a24 → A24)
-2. **Kontrol:** Bölge kodu listede yoksa hata verir
-3. **Karşılama mesajı:** Yeşil kutuda öğrencinin adıyla özel mesaj gösterilir
-4. **3 saniye bekleme:** Mesajı okusunlar diye, sonra otomatik haritaya geçer
-5. **Excel'de görünüm:** `A24 - MERYEM GÖKLER` şeklinde kaydedilir
+1. **Excel'de sadece bölge kodu:** `A24` (isim yok) ✅
+2. **Dosya ismi:** `A24_beton_2024...` (Türkçe karakter yok) ✅
+3. **Mesaj gösterilir** ama beklemez ✅
+4. **"Devam Et" butonu** ile öğrenci hazır olunca ilerler ✅
+5. **Bölge kodu kilitleniyor** (yanlışlıkla değişmesin) ✅
 
 ---
 
-## 🎨 Görünüm:
-
-Öğrenci **A24** girdiğinde:
+## 🎨 Akış:
 ```
-┌────────────────────────────────────┐
-│  👋 Merhaba MERYEM GÖKLER!        │
-│                                    │
-│  Yaptığın çalışma, depremlere     │
-│  karşı daha güvenli bir           │
-│  Altınyayla için çok önemli.      │
-│                                    │
-│  Her bir gözlemin, gelecekte      │
-│  hayat kurtaracak bilgilerin      │
-│  parçası olacak.                  │
-│                                    │
-│  Dikkatli ve özenli çalışman      │
-│  için teşekkür ederiz. 💪         │
-└────────────────────────────────────┘
+1. Öğrenci A24 yazar
+   ↓
+2. "Başla" butonuna basar
+   ↓
+3. Yeşil kutuda mesaj görünür:
+   "👋 Merhaba MERYEM GÖKLER! ..."
+   ↓
+4. "Devam Et 🚀" butonu belirir
+   ↓
+5. Öğrenci butona basınca → Haritaya geçer
 
         // Harita başlatma
         function initMap() {
