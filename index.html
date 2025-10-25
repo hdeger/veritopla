@@ -883,51 +883,20 @@ function saveCurrentData() {
         }
 
         // Excel ve Fotoğrafları ZIP olarak aktar
-        function exportToExcel() {
-            if (allData.length === 0) {
-                alert('Henüz veri yok!');
-                return;
-            }
+// Excel ve Fotoğrafları ZIP olarak aktar
+function exportToExcel() {
+    if (allData.length === 0) {
+        alert('Henüz veri yok!');
+        return;
+    }
 
-                // BURAYA EKLE - Kullanıcıya seçenek sun
+    // Kullanıcıya seçenek sun
     if (confirm('📤 Dosyayı nasıl göndermek istersiniz?\n\n✅ TAMAM = Direkt WhatsApp\'a gönder\n❌ İPTAL = Telefona indir')) {
         exportAndShare(); // Yeni fonksiyon
     } else {
         exportAndDownload(); // Eski fonksiyon
     }
-
-            
-            // Excel verisini hazırla
-            const ws_data = [
-                ['Bina No', 'Kullanıcı', 'Tarih-Saat', 'Enlem', 'Boylam', ...questions.map(q => q.text), 'Fotoğraf Dosyası']
-            ];
-            
-            allData.forEach((data, index) => {
-                const row = [
-                    index + 1,
-                    data.userName || userName,
-                    data.datetime,
-                    data.lat,
-                    data.lng,
-                    ...questions.map(q => data.answers[q.id] || '-'),
-                    data.photo ? `fotograflar/bina_${index + 1}.jpg` : 'Yok'
-                ];
-                ws_data.push(row);
-            });
-            
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            XLSX.utils.book_append_sheet(wb, ws, 'Bina Verileri');
-            
-            // Excel'i binary olarak oluştur
-            const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-            
-            const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
-            const safeUserName = userName.replace(/\s+/g, '_');
-            
-            // ZIP oluştur
-            createCompleteZip(excelBuffer, safeUserName, timestamp);
-        }
+}
 
 // Fonksiyon 1: Telefona İndir (Eski Yöntem)
 function exportAndDownload() {
@@ -1013,34 +982,30 @@ function exportAndShare() {
     
     const zipFilename = `${safeUserName}_beton_${timestamp}`;
     
-    zip.generateAsync({type: "blob"}).then(function(content) {
-        if (shareMode) {
-    // Önce dosyayı indir
-    downloadZipFile(content, zipFilename);
-    
-    // Sonra WhatsApp mesajı hazırla
-    const message = `📦 Bina Veri Toplama\n\nBölge: ${safeUserName}\nToplam Bina: ${allData.length}\nFotoğraf: ${photoCount} adet\n\nDosya adı: ${zipFilename}.zip\n(İndirilenler klasöründe)`;
-    
-    const whatsappUrl = `https://wa.me/905075608448?text=${encodeURIComponent(message)}`;
-    
-    // Kullanıcıya bilgi ver
-    if (confirm('✅ Dosya indirildi!\n\n📱 WhatsApp\'ı açıp dosyayı eklemek ister misiniz?\n\n(TAMAM = WhatsApp aç, İPTAL = Sonra gönder)')) {
-        window.open(whatsappUrl, '_blank');
-        setTimeout(() => {
-            alert('💡 WhatsApp açıldı!\n\n1. Yukarıdaki mesaj otomatik yazıldı\n2. 📎 Ataç butonuna bas\n3. "Dosya" seç\n4. İndirilenler klasöründen ZIP\'i seç\n5. Gönder!');
-        }, 1000);
-    }
-} else {
-    // Normal indirme
-    downloadZipFile(content, zipFilename);
-}
-            });
-        } else {
-            // Normal İndirme
-            downloadZipFile(content, zipFilename);
-            alert(`✅ İndirme tamamlandı!\n\n📦 Dosya: ${zipFilename}.zip\n📊 ${photoCount} fotoğraf\n\n📍 "İndirilenler" klasöründe`);
+zip.generateAsync({type: "blob"}).then(function(content) {
+    if (shareMode) {
+        // Önce dosyayı indir
+        downloadZipFile(content, zipFilename);
+        
+        // Sonra WhatsApp mesajı hazırla
+        const message = `📦 Bina Veri Toplama\n\nBölge: ${safeUserName}\nToplam Bina: ${allData.length}\nFotoğraf: ${photoCount} adet\n\nDosya adı: ${zipFilename}.zip\n(İndirilenler klasöründe)`;
+        
+        const whatsappUrl = `https://wa.me/905075608448?text=${encodeURIComponent(message)}`;
+        
+        // Kullanıcıya bilgi ver
+        if (confirm('✅ Dosya indirildi!\n\n📱 WhatsApp\'ı açıp dosyayı eklemek ister misiniz?\n\n(TAMAM = WhatsApp aç, İPTAL = Sonra gönder)')) {
+            window.open(whatsappUrl, '_blank');
+            setTimeout(() => {
+                alert('💡 WhatsApp açıldı!\n\n1. Yukarıdaki mesaj otomatik yazıldı\n2. 📎 Ataç butonuna bas\n3. "Dosya" seç\n4. İndirilenler klasöründen ZIP\'i seç\n5. Gönder!');
+            }, 1000);
         }
-    });
+    } else {
+        // Normal indirme
+        downloadZipFile(content, zipFilename);
+        alert(`✅ İndirme tamamlandı!\n\n📦 Dosya: ${zipFilename}.zip\n📊 ${photoCount} fotoğraf\n\n📍 "İndirilenler" klasöründe`);
+    }
+});
+            
 }
 
 // Yardımcı fonksiyon: ZIP dosyasını indir
