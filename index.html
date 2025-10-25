@@ -1014,21 +1014,26 @@ function exportAndShare() {
     const zipFilename = `${safeUserName}_beton_${timestamp}`;
     
     zip.generateAsync({type: "blob"}).then(function(content) {
-        if (shareMode && navigator.share) {
-            // WhatsApp Paylaşımı
-            const file = new File([content], zipFilename + '.zip', { type: 'application/zip' });
-            
-            navigator.share({
-                files: [file],
-                title: 'Bina Veri Toplama',
-                text: `Bölge: ${safeUserName}\nToplam: ${allData.length} bina\nFotoğraf: ${photoCount} adet`
-            }).then(() => {
-                alert('✅ Dosya başarıyla paylaşıldı!');
-            }).catch((error) => {
-                if (error.name !== 'AbortError') {
-                    alert('❌ Paylaşım iptal edildi veya başarısız oldu.\n\nDosya "İndirilenler" klasörüne kaydediliyor...');
-                    downloadZipFile(content, zipFilename);
-                }
+        if (shareMode) {
+    // Önce dosyayı indir
+    downloadZipFile(content, zipFilename);
+    
+    // Sonra WhatsApp mesajı hazırla
+    const message = `📦 Bina Veri Toplama\n\nBölge: ${safeUserName}\nToplam Bina: ${allData.length}\nFotoğraf: ${photoCount} adet\n\nDosya adı: ${zipFilename}.zip\n(İndirilenler klasöründe)`;
+    
+    const whatsappUrl = `https://wa.me/905075608448?text=${encodeURIComponent(message)}`;
+    
+    // Kullanıcıya bilgi ver
+    if (confirm('✅ Dosya indirildi!\n\n📱 WhatsApp\'ı açıp dosyayı eklemek ister misiniz?\n\n(TAMAM = WhatsApp aç, İPTAL = Sonra gönder)')) {
+        window.open(whatsappUrl, '_blank');
+        setTimeout(() => {
+            alert('💡 WhatsApp açıldı!\n\n1. Yukarıdaki mesaj otomatik yazıldı\n2. 📎 Ataç butonuna bas\n3. "Dosya" seç\n4. İndirilenler klasöründen ZIP\'i seç\n5. Gönder!');
+        }, 1000);
+    }
+} else {
+    // Normal indirme
+    downloadZipFile(content, zipFilename);
+}
             });
         } else {
             // Normal İndirme
