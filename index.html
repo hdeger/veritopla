@@ -983,28 +983,20 @@ function exportAndShare() {
     const zipFilename = `${safeUserName}_beton_${timestamp}`;
     
 zip.generateAsync({type: "blob"}).then(function(content) {
-  if (shareMode) {
+ if (shareMode) {
     // Önce dosyayı indir
     downloadZipFile(content, zipFilename);
     
     // Sonra WhatsApp mesajı hazırla
     const message = `📦 Bina Veri Toplama\n\nBölge: ${safeUserName}\nToplam Bina: ${allData.length}\nFotoğraf: ${photoCount} adet\n\nDosya adı: ${zipFilename}.zip\n(İndirilenler klasöründe)`;
     
-    // Mobilde WhatsApp app protokolü
-    const whatsappUrl = `whatsapp://send?phone=905075608448&text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/905075608448?text=${encodeURIComponent(message)}`;
     
-    // Bilgi mesajı göster
-    alert('✅ Dosya indirildi!\n\n📱 WhatsApp açılıyor...');
-    
-    // WhatsApp'ı aç
-    window.location.href = whatsappUrl;
-    
-    // Eğer WhatsApp açılmazsa web versiyonunu dene
+    // Kullanıcıya bilgi ver ve direkt aç
     setTimeout(() => {
-        // Kullanıcı hala sayfadaysa web versiyonunu aç
-        const webWhatsapp = `https://wa.me/905075608448?text=${encodeURIComponent(message)}`;
-        window.open(webWhatsapp, '_blank');
-    }, 2000);
+        alert('✅ Dosya indirildi!\n\n📱 Şimdi WhatsApp açılacak...');
+        window.location.href = whatsappUrl;
+    }, 500);
 }
 
 // Yardımcı fonksiyon: ZIP dosyasını indir
