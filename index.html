@@ -983,29 +983,28 @@ function exportAndShare() {
     const zipFilename = `${safeUserName}_beton_${timestamp}`;
     
 zip.generateAsync({type: "blob"}).then(function(content) {
-    if (shareMode) {
-        // Önce dosyayı indir
-        downloadZipFile(content, zipFilename);
-        
-        // Sonra WhatsApp mesajı hazırla
-        const message = `📦 Bina Veri Toplama\n\nBölge: ${safeUserName}\nToplam Bina: ${allData.length}\nFotoğraf: ${photoCount} adet\n\nDosya adı: ${zipFilename}.zip\n(İndirilenler klasöründe)`;
-        
-        const whatsappUrl = `https://wa.me/905075608448?text=${encodeURIComponent(message)}`;
-        
-        // Kullanıcıya bilgi ver
-        if (confirm('✅ Dosya indirildi!\n\n📱 WhatsApp\'ı açıp dosyayı eklemek ister misiniz?\n\n(TAMAM = WhatsApp aç, İPTAL = Sonra gönder)')) {
-            window.open(whatsappUrl, '_blank');
-            setTimeout(() => {
-                alert('💡 WhatsApp açıldı!\n\n1. Yukarıdaki mesaj otomatik yazıldı\n2. 📎 Ataç butonuna bas\n3. "Dosya" seç\n4. İndirilenler klasöründen ZIP\'i seç\n5. Gönder!');
-            }, 1000);
-        }
-    } else {
-        // Normal indirme
-        downloadZipFile(content, zipFilename);
-        alert(`✅ İndirme tamamlandı!\n\n📦 Dosya: ${zipFilename}.zip\n📊 ${photoCount} fotoğraf\n\n📍 "İndirilenler" klasöründe`);
-    }
-});
-            
+  if (shareMode) {
+    // Önce dosyayı indir
+    downloadZipFile(content, zipFilename);
+    
+    // Sonra WhatsApp mesajı hazırla
+    const message = `📦 Bina Veri Toplama\n\nBölge: ${safeUserName}\nToplam Bina: ${allData.length}\nFotoğraf: ${photoCount} adet\n\nDosya adı: ${zipFilename}.zip\n(İndirilenler klasöründe)`;
+    
+    // Mobilde WhatsApp app protokolü
+    const whatsappUrl = `whatsapp://send?phone=905075608448&text=${encodeURIComponent(message)}`;
+    
+    // Bilgi mesajı göster
+    alert('✅ Dosya indirildi!\n\n📱 WhatsApp açılıyor...');
+    
+    // WhatsApp'ı aç
+    window.location.href = whatsappUrl;
+    
+    // Eğer WhatsApp açılmazsa web versiyonunu dene
+    setTimeout(() => {
+        // Kullanıcı hala sayfadaysa web versiyonunu aç
+        const webWhatsapp = `https://wa.me/905075608448?text=${encodeURIComponent(message)}`;
+        window.open(webWhatsapp, '_blank');
+    }, 2000);
 }
 
 // Yardımcı fonksiyon: ZIP dosyasını indir
