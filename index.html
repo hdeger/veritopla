@@ -883,129 +883,75 @@ function saveCurrentData() {
         }
 
         // Excel ve Fotoğrafları ZIP olarak aktar
-// Excel ve Fotoğrafları ZIP olarak aktar
-function exportToExcel() {
-    if (allData.length === 0) {
-        alert('Henüz veri yok!');
-        return;
-    }
-
-    // Kullanıcıya seçenek sun
-    if (confirm('📤 Dosyayı nasıl göndermek istersiniz?\n\n✅ TAMAM = Direkt WhatsApp\'a gönder\n❌ İPTAL = Telefona indir')) {
-        exportAndShare(); // Yeni fonksiyon
-    } else {
-        exportAndDownload(); // Eski fonksiyon
-    }
-}
-
-// Fonksiyon 1: Telefona İndir (Eski Yöntem)
-function exportAndDownload() {
-    // Excel verisini hazırla
-    const ws_data = [
-        ['Bina No', 'Kullanıcı', 'Tarih-Saat', 'Enlem', 'Boylam', ...questions.map(q => q.text), 'Fotoğraf Dosyası']
-    ];
-    
-    allData.forEach((data, index) => {
-        const row = [
-            index + 1,
-            data.userName || userName,
-            data.datetime,
-            data.lat,
-            data.lng,
-            ...questions.map(q => data.answers[q.id] || '-'),
-            data.photo ? `fotograflar/bina_${index + 1}.jpg` : 'Yok'
-        ];
-        ws_data.push(row);
-    });
-    
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(ws_data);
-    XLSX.utils.book_append_sheet(wb, ws, 'Bina Verileri');
-    
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    
-    const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
-    const safeUserName = userName.replace(/\s+/g, '_');
-    
-    createCompleteZip(excelBuffer, safeUserName, timestamp, false);
-}
-
-// Fonksiyon 2: WhatsApp'a Direkt Paylaş (Yeni Yöntem)
-function exportAndShare() {
-    // Excel verisini hazırla
-    const ws_data = [
-        ['Bina No', 'Kullanıcı', 'Tarih-Saat', 'Enlem', 'Boylam', ...questions.map(q => q.text), 'Fotoğraf Dosyası']
-    ];
-    
-    allData.forEach((data, index) => {
-        const row = [
-            index + 1,
-            data.userName || userName,
-            data.datetime,
-            data.lat,
-            data.lng,
-            ...questions.map(q => data.answers[q.id] || '-'),
-            data.photo ? `fotograflar/bina_${index + 1}.jpg` : 'Yok'
-        ];
-        ws_data.push(row);
-    });
-    
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(ws_data);
-    XLSX.utils.book_append_sheet(wb, ws, 'Bina Verileri');
-    
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    
-    const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
-    const safeUserName = userName.replace(/\s+/g, '_');
-    
-    createCompleteZip(excelBuffer, safeUserName, timestamp, true);
-}
+        function exportToExcel() {
+            if (allData.length === 0) {
+                alert('Henüz veri yok!');
+                return;
+            }
+            
+            // Excel verisini hazırla
+            const ws_data = [
+                ['Bina No', 'Kullanıcı', 'Tarih-Saat', 'Enlem', 'Boylam', ...questions.map(q => q.text), 'Fotoğraf Dosyası']
+            ];
+            
+            allData.forEach((data, index) => {
+                const row = [
+                    index + 1,
+                    data.userName || userName,
+                    data.datetime,
+                    data.lat,
+                    data.lng,
+                    ...questions.map(q => data.answers[q.id] || '-'),
+                    data.photo ? `fotograflar/bina_${index + 1}.jpg` : 'Yok'
+                ];
+                ws_data.push(row);
+            });
+            
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, 'Bina Verileri');
+            
+            // Excel'i binary olarak oluştur
+            const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            
+            const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+            const safeUserName = userName.replace(/\s+/g, '_');
+            
+            // ZIP oluştur
+            createCompleteZip(excelBuffer, safeUserName, timestamp);
+        }
         
         // Excel ve Fotoğrafları tek ZIP'te birleştir
-        function createCompleteZip(excelBuffer, safeUserName, timestamp, shareMode = false) {
-    const zip = new JSZip();
-    
-    const excelFilename = `${safeUserName}_bina_verileri_${timestamp}.xlsx`;
-    zip.file(excelFilename, excelBuffer);
-    
-    const photosFolder = zip.folder("fotograflar");
-    let photoCount = 0;
-    
-    allData.forEach((data, index) => {
-        if (data.photo) {
-            const base64Data = data.photo.split(',')[1];
-            photosFolder.file(`bina_${index + 1}.jpg`, base64Data, {base64: true});
-            photoCount++;
+        function createCompleteZip(excelBuffer, safeUserName, timestamp) {
+            const zip = new JSZip();
+            
+            // Excel dosyasını ekle
+            const excelFilename = `${safeUserName}_bina_verileri_${timestamp}.xlsx`;
+            zip.file(excelFilename, excelBuffer);
+            
+            // Fotoğraflar klasörü oluştur ve fotoğrafları ekle
+            const photosFolder = zip.folder("fotograflar");
+            let photoCount = 0;
+            
+            allData.forEach((data, index) => {
+                if (data.photo) {
+                    const base64Data = data.photo.split(',')[1];
+                    photosFolder.file(`bina_${index + 1}.jpg`, base64Data, {base64: true});
+                    photoCount++;
+                }
+            });
+            
+            // ZIP'i indir
+            const zipFilename = `${safeUserName}_beton_${timestamp}`;
+            zip.generateAsync({type: "blob"}).then(function(content) {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = zipFilename + '.zip';
+                link.click();
+                
+                alert(`✅ İndirme tamamlandı!\n\n📦 Dosya: ${zipFilename}.zip\n📊 Excel dosyası ve ${photoCount} fotoğraf ZIP içinde!\n\nTek dosyayı gönderin!`);
+            });
         }
-    });
-    
-    const zipFilename = `${safeUserName}_beton_${timestamp}`;
-    
-zip.generateAsync({type: "blob"}).then(function(content) {
- if (shareMode) {
-    // Önce dosyayı indir
-    downloadZipFile(content, zipFilename);
-    
-    // Sonra WhatsApp mesajı hazırla
-    const message = `📦 Bina Veri Toplama\n\nBölge: ${safeUserName}\nToplam Bina: ${allData.length}\nFotoğraf: ${photoCount} adet\n\nDosya adı: ${zipFilename}.zip\n(İndirilenler klasöründe)`;
-    
-    const whatsappUrl = `https://wa.me/905075608448?text=${encodeURIComponent(message)}`;
-    
-    // Kullanıcıya bilgi ver ve direkt aç
-    setTimeout(() => {
-        alert('✅ Dosya indirildi!\n\n📱 Şimdi WhatsApp açılacak...');
-        window.location.href = whatsappUrl;
-    }, 500);
-}
-
-// Yardımcı fonksiyon: ZIP dosyasını indir
-function downloadZipFile(content, filename) {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(content);
-    link.download = filename + '.zip';
-    link.click();
-}
 
         // Sayfa yüklendiğinde haritayı başlat
         window.onload = function() {
